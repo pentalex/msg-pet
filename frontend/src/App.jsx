@@ -35,20 +35,6 @@ function App() {
           <p className="text-center font-mono text-xs text-gray-500">
             end-to-end encrypted · server blind · one view only
           </p>
-          <p className="text-center font-mono text-xs text-gray-500">
-            {commitUrl ? (
-              <a
-                href={commitUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-2 text-gray-400 hover:text-black transition underline"
-              >
-                commit: {commitHash}
-              </a>
-            ) : (
-              <span className="ml-2 text-gray-400">commit: {commitHash}</span>
-            )}
-          </p>
         </footer>
       </div>
     </BrowserRouter>
