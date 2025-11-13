@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import CreateMessage from "./components/CreateMessage";
 import ViewMessage from "./components/ViewMessage";
 
@@ -16,10 +16,12 @@ function App() {
       <div className="min-h-screen bg-black">
         <header className="border-b-2 border-black bg-black p-6">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-center font-mono text-2xl font-bold text-white">
-              msg.pet
+            <h1 className="text-center font-mono text-4xl font-bold text-white">
+              <Link to="/" className="text-white hover:text-gray-300">
+                msg.pet
+              </Link>
             </h1>
-            <p className="text-center font-mono text-xs text-gray-600 mt-1">
+            <p className="text-center font-mono text-md text-gray-600 mt-1">
               send self-destructing messages
             </p>
           </div>

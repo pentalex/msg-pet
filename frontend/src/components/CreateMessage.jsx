@@ -42,7 +42,7 @@ export default function CreateMessage() {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="border-2 border-white bg-stone-9950 p-6">
-          <p className="text-xl mb-4 text-neutral-500">
+          <p className="text-xl mb-4 text-gray-600">
             (๑•̀ㅂ•́)و✧ link created! share it carefully.
           </p>
           <div className="bg-black p-4 mb-4 font-mono text-md break-all text-white">
@@ -51,7 +51,7 @@ export default function CreateMessage() {
           <div className="flex gap-2">
             <button
               onClick={handleCopy}
-              className="flex-1 border-2 border-white bg-black text-white px-4 py-2 font-mono text-sm hover:bg-gray-100 transition"
+              className="flex-1 border-2 border-white bg-white text-black px-4 py-2 font-mono text-sm hover:bg-gray-100 transition"
             >
               {copied ? "✓ copied" : "copy link"}
             </button>

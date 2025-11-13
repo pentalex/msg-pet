@@ -70,17 +70,14 @@ export default function ViewMessage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="border-2 border-black bg-white p-6">
-        <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-200">
+      <div className="border-2 border-black bg-black p-6">
+        <div className="flex items-center justify-between mb-4 pb-4 ">
           <p className="font-mono text-sm text-gray-600">secret message</p>
           <p className="font-mono text-xs text-red-600">burns after reading</p>
         </div>
-        <div className="bg-black p-6 font-mono text-sm text-green-400 whitespace-pre-wrap min-h-[200px]">
+        <div className="bg-black border-white border-2 p-6 font-mono text-sm text-white whitespace-pre-wrap min-h-[200px]">
           {message}
         </div>
-        <p className="text-xs text-gray-500 mt-4 text-center">
-          · this message has been deleted from the server ·
-        </p>
       </div>
     </div>
   );
