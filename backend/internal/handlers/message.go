@@ -1,15 +1,16 @@
 package handlers
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"io"
+	"math/big"
 	"net/http"
 
 	"opage/internal/config"
 	"opage/internal/storage"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 )
 
 type MessageHandler struct {
@@ -38,6 +39,20 @@ type GetResponse struct {
 	EncryptedData string `json:"encrypted_data"`
 }
 
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func generateShortID(length int) (string, error) {
+	result := make([]byte, length)
+	for i := range result {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphabet))))
+		if err != nil {
+			return "", err
+		}
+		result[i] = alphabet[num.Int64()]
+	}
+	return string(result), nil
+}
+
 func (h *MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	var req CreateRequest
 
@@ -61,17 +76,35 @@ func (h *MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	if ttl <= 0 || ttl > h.config.DefaultTTL {
 		ttl = h.config.DefaultTTL
 	}
+	var id string
+	var storeErr error
 
-	id := uuid.New().String()
+	for i := 0; i < 3; i++ {
+		id, err = generateShortID(8)
+		if err != nil {
+			http.Error(w, "Failed to generate ID", http.StatusInternalServerError)
+			return
+		}
 
-	if err := h.storage.Store(r.Context(), id, []byte(req.EncryptedData), ttl); err != nil {
-		http.Error(w, "Failed to store message", http.StatusInternalServerError)
+		storeErr = h.storage.Store(r.Context(), id, []byte(req.EncryptedData), ttl)
+		if storeErr == nil {
+			break
+		}
+		if storeErr != storage.ErrAlreadyExists {
+			http.Error(w, "Failed to store message", http.StatusInternalServerError)
+			return
+		}
+
+	}
+
+	if storeErr == storage.ErrAlreadyExists {
+		http.Error(w, "Failed to generate unique ID, please retry", http.StatusInternalServerError)
 		return
 	}
 
 	resp := CreateResponse{
 		ID:  id,
-		URL: "https://o.page/" + id, // Update with your actual domain
+		URL: "https://o.page/" + id,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

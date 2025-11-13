@@ -6,13 +6,15 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-black">
-        <header className="p-6">
-          <h1 className="text-4xl font-bold text-center text-gray-800">
-            o.page
-          </h1>
-          <p className="text-center text-gray-600 mt-2">
-            send self-destructing messages that disappear after one view
-          </p>
+        <header className="border-b-2 border-black bg-black p-6">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-center font-mono text-2xl font-bold text-white">
+              msg.pet
+            </h1>
+            <p className="text-center font-mono text-xs text-gray-600 mt-1">
+              send self-destructing messages
+            </p>
+          </div>
         </header>
 
         <main className="py-8">
@@ -21,8 +23,11 @@ function App() {
             <Route path="/:id" element={<ViewMessage />} />
           </Routes>
         </main>
-
-        <footer className="text-center text-gray-500 text-sm py-8"></footer>
+        <footer className="fixed bottom-0 w-full border-t-2 border-gray-800 bg-black p-4">
+          <p className="text-center font-mono text-xs text-gray-500">
+            · end-to-end encrypted · server blind · one view only ·
+          </p>
+        </footer>
       </div>
     </BrowserRouter>
   );

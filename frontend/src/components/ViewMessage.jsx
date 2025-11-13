@@ -1,72 +1,68 @@
-import { useState } from "react";
-import { generateKey, encryptMessage } from "../utils/crypto";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { decryptMessage } from "../utils/crypto";
 
-export default function CreateMessage() {
+export default function ViewMessage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const hasFetched = useRef(false);
 
-  const handleCreate = async () => {
-    if (!message.trim()) return;
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
-    setLoading(true);
-    try {
-      const key = await generateKey();
-      const encrypted = await encryptMessage(message, key);
+    const loadMessage = async () => {
+      try {
+        const key = window.location.hash.slice(1);
+        if (!key) {
+          throw new Error("no decryption key found");
+        }
 
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ encrypted_data: encrypted }),
-      });
+        const API_URL = import.meta.env.VITE_API_URL || "";
+        const response = await fetch(`${API_URL}/api/messages/${id}`);
+        if (!response.ok) {
+          throw new Error("message not found or already viewed");
+        }
 
-      const data = await response.json();
-      const url = `${window.location.origin}/${data.id}#${key}`;
-      setShareUrl(url);
-    } catch (error) {
-      alert("Failed to create message: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const data = await response.json();
+        const decrypted = await decryptMessage(data.encrypted_data, key);
+        setMessage(decrypted);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    loadMessage();
+  }, [id]);
 
-  if (shareUrl) {
+  if (loading) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            Message Created!
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Share this link. It will self-destruct after being viewed once.
+        <div className="border-2 border-black bg-white p-8 text-center">
+          <p className="font-mono text-sm">decrypting message... (　･ω･)</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <div className="border-2 border-red-500 bg-black p-8">
+          <p className="font-mono text-sm mb-4 text-red-600">
+            (｡•́︿•̀｡) {error}
           </p>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200 mb-4">
-            <code className="text-sm break-all text-gray-700">{shareUrl}</code>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleCopy}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-            >
-              {copied ? "✓ Copied!" : "Copy Link"}
-            </button>
-            <button
-              onClick={() => {
-                setShareUrl("");
-                setMessage("");
-              }}
-              className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
-            >
-              Create Another
-            </button>
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="border-2 border-white bg-white text-black px-4 py-2 font-mono text-sm hover:bg-gray-100 transition"
+          >
+            ← back home
+          </button>
         </div>
       </div>
     );
@@ -74,25 +70,16 @@ export default function CreateMessage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          Create Burner Message
-        </h2>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your secret message..."
-          className="w-full h-48 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        <button
-          onClick={handleCreate}
-          disabled={loading || !message.trim()}
-          className="w-full mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
-        >
-          {loading ? "Creating..." : "Create One-Time Link"}
-        </button>
-        <p className="mt-4 text-sm text-gray-500 text-center">
-          🔒 Messages are encrypted in your browser. We never see the content.
+      <div className="border-2 border-black bg-white p-6">
+        <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-200">
+          <p className="font-mono text-sm text-gray-600">secret message</p>
+          <p className="font-mono text-xs text-red-600">burns after reading</p>
+        </div>
+        <div className="bg-black p-6 font-mono text-sm text-green-400 whitespace-pre-wrap min-h-[200px]">
+          {message}
+        </div>
+        <p className="text-xs text-gray-500 mt-4 text-center">
+          · this message has been deleted from the server ·
         </p>
       </div>
     </div>

@@ -15,7 +15,8 @@ export default function CreateMessage() {
       const key = await generateKey();
       const encrypted = await encryptMessage(message, key);
 
-      const response = await fetch("/api/messages", {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const response = await fetch(`${API_URL}/api/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ encrypted_data: encrypted }),
@@ -25,7 +26,7 @@ export default function CreateMessage() {
       const url = `${window.location.origin}/${data.id}#${key}`;
       setShareUrl(url);
     } catch (error) {
-      alert("Failed to create message: " + error.message);
+      alert("failed to create message: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -40,56 +41,59 @@ export default function CreateMessage() {
   if (shareUrl) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            Message Created!
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Share this link. It will self-destruct after being viewed once.
+        <div className="border-2 border-white bg-stone-9950 p-6">
+          <p className="text-xl mb-4 text-neutral-500">
+            (๑•̀ㅂ•́)و✧ link created! share it carefully.
           </p>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200 mb-4">
-            <code className="text-sm break-all text-gray-700">{shareUrl}</code>
+          <div className="bg-black p-4 mb-4 font-mono text-md break-all text-white">
+            {shareUrl}
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <button
               onClick={handleCopy}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+              className="flex-1 border-2 border-white bg-black text-white px-4 py-2 font-mono text-sm hover:bg-gray-100 transition"
             >
-              {copied ? "✓ Copied!" : "Copy Link"}
+              {copied ? "✓ copied" : "copy link"}
             </button>
             <button
               onClick={() => {
                 setShareUrl("");
                 setMessage("");
               }}
-              className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
+              className="border-2 border-black bg-white px-4 py-2 font-mono text-sm hover:bg-gray-100 transition"
             >
-              Create Another
+              new
             </button>
           </div>
+          <p className="text-xs text-gray-500 mt-4">
+            self-destructs after one view
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <div className=" shadow-lg p-8">
+    <div className="max-w-2xl mx-auto p-6">
+      <div className="border-2 border-white bg-black p-6">
+        <p className="text-xl mb-4 text-gray-600">
+          (｡•̀ᴗ-)✧ write something secret
+        </p>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="type your secret message..."
-          className="w-full h-48 p-4 border bg-black focus:outline-none text-white border-black focus:border-black"
+          placeholder="your message goes here..."
+          className="w-full h-48 p-4 border-2 border-black bg-black text-white font-mono text-md focus:outline-none focus:ring-2 focus:ring-gray-400 resize-none"
         />
         <button
           onClick={handleCreate}
           disabled={loading || !message.trim()}
-          className="w-full mt-4 bg-stone-600 text-white px-6 py-3  font-medium hover:bg-stone-700 disabled:bg-stone-950 disabled:cursor-not-allowed transition"
+          className="w-full mt-4 border-2 border-black bg-white text-black px-6 py-3 font-mono text-sm hover:bg-gray-100 disabled:bg-stone-950 disabled:text-gray-500 disabled:border-stone-800 disabled:cursor-not-allowed transition"
         >
-          {loading ? "Creating..." : "create link"}
+          {loading ? "creating..." : "→ create one-time link"}
         </button>
-        <p className="mt-4 text-sm text-gray-500 text-center">
-          messages are encrypted in your browser. we never see the content.
+        <p className="text-xs text-gray-500 mt-4 text-center">
+          encrypted in your browser, server never sees content
         </p>
       </div>
     </div>
