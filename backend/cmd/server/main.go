@@ -30,10 +30,11 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "DELETE"},
-		AllowedHeaders: []string{"Content-Type"},
-		MaxAge:         300,
+		AllowedOrigins:   []string{"*"}, // Or specify your Netlify URL
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: false,
+		MaxAge:           300,
 	}))
 
 	r.Post("/api/messages", h.CreateMessage)
