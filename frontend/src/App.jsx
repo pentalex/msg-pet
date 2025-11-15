@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import CreateMessage from "./components/CreateMessage";
 import ViewMessage from "./components/ViewMessage";
-
+import Logo from "./assets/logo.svg";
 function App() {
   const commitHash = import.meta.env.VITE_COMMIT_REF?.substring(0, 7) || "dev";
   const repoUrl = import.meta.env.VITE_REPO_URL || "";
@@ -14,14 +14,18 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-black">
-        <header className="border-b-2 border-black bg-black p-6">
+        <header className="  bg-black p-6">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-center font-mono text-4xl font-bold text-white">
-              <Link to="/" className="text-white hover:text-gray-300">
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-3 hover:opacity-80 transition"
+            >
+              <img src={Logo} alt="msg.pet logo" className="w-12 h-12" />
+              <h1 className="font-mono text-4xl font-bold text-white">
                 msg.pet
-              </Link>
-            </h1>
-            <p className="text-center font-mono text-md text-gray-600 mt-1">
+              </h1>
+            </Link>
+            <p className="text-center font-mono text-md text-gray-600 mt-2">
               send self-destructing messages
             </p>
           </div>

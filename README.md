@@ -1,7 +1,5 @@
 # msg.pet (◕‿◕)
 
-> send self-destructing messages that burn after reading
-
 a minimalist, end-to-end encrypted messaging service where messages automatically delete after being viewed once.
 
 **[live demo →](https://msg.pet)**
